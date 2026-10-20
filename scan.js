@@ -1,5 +1,5 @@
 import * as THREE from './three.module.js';
-import {GLTFLoader} from './vendor/GLTFLoader.js';
+import {GLTFLoader} from './GLTFLoader.js';
 const $=s=>document.querySelector(s);
 export function initScan(){
  const canvas=$('#crystal'),stage=$('#stage'),loading=$('#scan-loading');let renderer=null;
@@ -26,7 +26,7 @@ export function initScan(){
  if(!renderer){worker=new Worker('./scan-worker.js');worker.onmessage=e=>{if(e.data.type==='ready'){ready=true;loading.hidden=true;return}if(e.data.type==='frame'){const {pixels,width,height}=e.data;frameCanvas.width=width;frameCanvas.height=height;frameContext.putImageData(new ImageData(new Uint8ClampedArray(pixels),width,height),0,0);fallbackContext.clearRect(0,0,surface.width,surface.height);fallbackContext.imageSmoothingEnabled=true;fallbackContext.drawImage(frameCanvas,0,0,surface.width,surface.height);busy=false;}};worker.onerror=()=>{loading.hidden=false;loading.textContent='The 3D renderer could not start. Please reload.'};worker.postMessage({type:'init',meshes:packed,texture:originalPixels.data,width:textureCanvas.width,height:textureCanvas.height});}
  else{ready=true;loading.hidden=true;}if(pendingColor)recolor();
  }
- new GLTFLoader().load('./assets/fluorite-scan.glb',normalize,p=>{if(p.total)loading.innerHTML=`Loading real specimen… <small>${Math.round(p.loaded/p.total*100)}% · photographic texture</small>`},()=>{loading.innerHTML='The specimen could not load.<small>Check your connection and reload.</small>'});
+ new GLTFLoader().load('./fluorite-scan.glb',normalize,p=>{if(p.total)loading.innerHTML=`Loading real specimen… <small>${Math.round(p.loaded/p.total*100)}% · photographic texture</small>`},()=>{loading.innerHTML='The specimen could not load.<small>Check your connection and reload.</small>'});
  surface.onpointerdown=e=>{drag=true;px=e.clientX;py=e.clientY;surface.setPointerCapture(e.pointerId)};
  surface.onpointermove=e=>{if(!drag)return;y+=(e.clientX-px)*.009;x+=(e.clientY-py)*.009;px=e.clientX;py=e.clientY};surface.onpointerup=surface.onpointercancel=()=>drag=false;
  surface.onwheel=e=>{e.preventDefault();zoom=THREE.MathUtils.clamp(zoom-e.deltaY*.001,.7,1.9) };
